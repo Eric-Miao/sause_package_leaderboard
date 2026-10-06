@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="料力榜：真实测评每一款复合调味料的色香味、还原度与易用性。">
+  <meta name="theme-color" content="#f0f0c0">
+  <title>料力榜｜今天，谁最有料？</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="data.js"></script>
+  <script type="module" src="app.mjs"></script>
+</head>
+<body>
+  <a class="skip-link" href="#full-ranking">跳到完整榜单</a>
+  <header class="site-header">
+    <a class="wordmark" href="#top" aria-label="料力榜首页">
+      <span class="wordmark-mark" aria-hidden="true"></span>
+      <span>料力榜</span>
+    </a>
+    <p>一包入魂，认真评分</p>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-intro">
+        <h1 id="hero-title">今天，<br><em>谁最有料？</em></h1>
+        <div class="hero-note">
+          <p>把每一包风味放进同一把尺子：色香味、还原度、易用性，实测后再上榜。</p>
+          <p class="tested"><strong id="tested-count">0</strong><span>款已测评</span></p>
+        </div>
+      </div>
+      <div id="podium" class="podium" aria-label="排行榜前三名"></div>
+    </section>
+
+    <section id="full-ranking" class="ranking-section" aria-labelledby="ranking-title">
+      <div class="ranking-heading">
+        <div>
+          <h2 id="ranking-title">完整料力榜</h2>
+          <p id="result-count" aria-live="polite">正在整理榜单</p>
+        </div>
+        <p>点开任一料包，查看一句真实评语。</p>
+      </div>
+
+      <form id="filters" class="filters" role="search" onsubmit="return false">
+        <label class="search-field" for="search">
+          <span>搜索料包</span>
+          <input id="search" type="search" placeholder="品牌、料包或评语" autocomplete="off">
+        </label>
+        <label for="brand">
+          <span>品牌</span>
+          <select id="brand"><option value="">全部品牌</option></select>
+        </label>
+        <label for="sort">
+          <span>排序</span>
+          <select id="sort">
+            <option value="score">料力评分</option>
+            <option value="flavor">色香味</option>
+            <option value="fidelity">还原度</option>
+            <option value="ease">易用性</option>
+            <option value="episode">测评期数</option>
+          </select>
+        </label>
+        <button id="direction" class="direction-button" type="button" aria-pressed="false">降序</button>
+      </form>
+
+      <div class="list-labels" aria-hidden="true">
+        <span>排名 / 料包</span><span>三项评分</span><span>总分</span>
+      </div>
+      <div id="ranking-list" class="ranking-list"></div>
+      <div id="empty-state" class="empty-state" hidden>
+        <h3>这次没找到</h3>
+        <p>换个关键词，或者清除筛选再看看。</p>
+        <button id="clear-filters" type="button">清除筛选</button>
+      </div>
+      <!-- NOSCRIPT_START --><noscript><section class="noscript-board"><h2>完整料力榜</h2><p>当前浏览器未启用 JavaScript，以下为按总分排列的基础榜单。</p><ol><li><strong>1. 万字 · 寿喜烧料汁</strong><span>4.2 分</span><p>汤浓味醇，咸味稍重</p></li><li><strong>2. 加点滋味 · 肉蟹煲</strong><span>4.1 分</span><p>鲜香微辣，值得一试</p></li><li><strong>3. 象大厨 · 日式照烧汁</strong><span>3.9 分</span><p>咸香入味，甜度较低</p></li><li><strong>4. 加点滋味 · 芥末小海鲜</strong><span>3.9 分</span><p>芥味清爽，略欠鲜香</p></li><li><strong>5. 山姆 · 金汤肥牛</strong><span>3.9 分</span><p>酸辣突出，香味稍弱</p></li><li><strong>6. 盒马 · 潮汕牛骨原汤</strong><span>3.8 分</span><p>清汤寡淡，平平无奇</p></li><li><strong>7. 加点滋味 · 泰式酸辣汁</strong><span>3.8 分</span><p>酸辣直愣，味略单薄</p></li><li><strong>8. 加点滋味 · 云南油焖鸡</strong><span>3.6 分</span><p>辣而少香，入味欠佳</p></li><li><strong>9. 加点滋味 · 牛肉麻婆豆腐</strong><span>3.4 分</span><p>咸重压味，麻香不足</p></li></ol></section></noscript><!-- NOSCRIPT_END -->
+    </section>
+  </main>
+
+  <footer>
+    <p>料力榜 · 每期认真吃，每包认真评</p>
+    <a href="#top">回到顶部</a>
+  </footer>
+</body>
+</html>
