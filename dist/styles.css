@@ -154,12 +154,16 @@ footer a { color: var(--ink); text-underline-offset: 5px; }
   .ranking-heading { display: block; }
   .ranking-heading > p { margin-top: 14px; text-align: left; }
   .filters { padding: 14px; }
+  .ranking-list { margin-top: 20px; }
   .rank-row summary { min-height: 86px; padding-inline: 16px; gap: 12px; }
   .list-rank { font-size: .95rem; }
   .total-score strong { font-size: 1.6rem; }
-  .rank-detail { display: flex; flex-direction: column; align-items: stretch; gap: 0; margin-inline: 16px; }
-  .rank-detail p { margin-top: 10px; }
-  .rank-detail .video-link { align-self: flex-end; order: 3; margin-top: 12px; }
+  .rank-detail { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; margin-inline: 16px; }
+  .rank-detail > div { display: contents; }
+  .rank-detail blockquote { grid-column: 1; grid-row: 1; margin-top: 18px; }
+  .rank-detail .video-link { grid-column: 2; grid-row: 1; align-self: center; margin-top: 18px; white-space: nowrap; }
+  .rank-detail .mobile-breakdown { grid-column: 1 / -1; grid-row: 2; }
+  .rank-detail p { grid-column: 1 / -1; grid-row: 3; margin-top: 10px; }
   footer { display: grid; gap: 14px; }
 }
 
