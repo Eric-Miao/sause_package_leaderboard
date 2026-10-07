@@ -12,11 +12,12 @@ export function escapeHtml(value) {
 export function queryRecords(records, options = {}) {
   const query = (options.query || "").trim().toLocaleLowerCase("zh-CN");
   const brands = options.brands;
+  const brand = options.brand || "";
   const sortKey = options.sortKey || "score";
   const direction = options.direction || "desc";
 
   return records
-    .filter((record) => brands === undefined || brands.includes(record.brand))
+    .filter((record) => brands === undefined ? !brand || record.brand === brand : brands.includes(record.brand))
     .filter((record) => {
       if (!query) return true;
       return [record.brand, record.name, record.comment]
@@ -101,7 +102,7 @@ function init() {
   const count = document.querySelector("#result-count");
   const empty = document.querySelector("#empty-state");
   const queryInput = document.querySelector("#search");
-  const brandOptions = document.querySelector("#brand-options");
+  const brandSelect = document.querySelector("#brand");
   const clearButton = document.querySelector("#clear-filters");
   let sort = { key: "score", direction: "desc" };
 
@@ -112,15 +113,12 @@ function init() {
 
   const brands = [...new Set(records.map((record) => record.brand))]
     .sort((a, b) => a.localeCompare(b, "zh-CN"))
-  brandOptions.innerHTML = brands.map((brand) => `
-    <label class="brand-check"><input type="checkbox" value="${escapeHtml(brand)}" checked><span>${escapeHtml(brand)}</span></label>
-  `).join("");
+  brands.forEach((brand) => brandSelect.add(new Option(brand, brand)));
 
   function render() {
-    const selectedBrands = [...brandOptions.querySelectorAll("input:checked")].map((input) => input.value);
     const result = queryRecords(records, {
       query: queryInput.value,
-      brands: selectedBrands,
+      brand: brandSelect.value,
       sortKey: sort.key,
       direction: sort.direction,
     });
@@ -141,17 +139,9 @@ function init() {
     });
     render();
   }));
-  document.querySelector("#select-all").addEventListener("click", () => {
-    brandOptions.querySelectorAll("input").forEach((input) => { input.checked = true; });
-    render();
-  });
-  document.querySelector("#deselect-all").addEventListener("click", () => {
-    brandOptions.querySelectorAll("input").forEach((input) => { input.checked = false; });
-    render();
-  });
   clearButton.addEventListener("click", () => {
     queryInput.value = "";
-    brandOptions.querySelectorAll("input").forEach((input) => { input.checked = true; });
+    brandSelect.value = "";
     sort = { key: "score", direction: "desc" };
     queryInput.focus();
     render();
