@@ -16,10 +16,10 @@ def make_workbook(path: Path) -> None:
         Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"/>
     </Relationships>"""
     rows = [
-        ["日期", "期数", "品牌", "料包", "色香味", "还原度", "易用性", "料力评分", "评语"],
-        [46274, "EP2", "甲牌", "好味汁", 4.2, 4.1, 4.0, 4.1, "鲜香"],
-        [46275, "EP1", "乙牌", "暖汤底", 4.0, 4.2, 4.1, 4.1, "温和"],
-        [46276, "EP3", "", "", "", "", "", "#DIV/0!", ""],
+        ["日期", "期数", "品牌", "料包", "色香味", "还原度", "易用性", "料力评分", "评语", "视频链接"],
+        [46274, "EP2", "甲牌", "好味汁", 4.2, 4.1, 4.0, 4.1, "鲜香", "分享 https://example.com/video/2 更多文字"],
+        [46275, "EP1", "乙牌", "暖汤底", 4.0, 4.2, 4.1, 4.1, "温和", "https://example.com/video/1"],
+        [46276, "EP3", "", "", "", "", "", "#DIV/0!", "", ""],
     ]
 
     def cell(ref: str, value: object) -> str:
@@ -57,6 +57,8 @@ class BuildDataTests(unittest.TestCase):
         self.assertEqual(records[0]["date"], "2026-09-10")
         self.assertEqual(records[0]["brand"], "乙牌")
         self.assertEqual(records[0]["score"], 4.1)
+        self.assertEqual(records[0]["video_url"], "https://example.com/video/1")
+        self.assertEqual(records[1]["video_url"], "https://example.com/video/2")
         self.assertNotIn("#DIV/0!", repr(records))
 
     def test_writes_browser_global(self):

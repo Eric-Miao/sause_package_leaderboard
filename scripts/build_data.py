@@ -22,6 +22,7 @@ FIELDS = {
     "易用性": "ease",
     "料力评分": "score",
     "评语": "comment",
+    "视频链接": "video_url",
 }
 
 
@@ -44,6 +45,11 @@ def _episode_number(value: str) -> int:
 
 def _excel_date(value: str) -> str:
     return (datetime(1899, 12, 30) + timedelta(days=float(value))).date().isoformat()
+
+
+def _first_url(value: str) -> str:
+    match = re.search(r"https?://\S+", value or "")
+    return match.group(0).rstrip("，。；;）)") if match else ""
 
 
 def extract_records(path: Path) -> list[dict]:
@@ -100,6 +106,7 @@ def extract_records(path: Path) -> list[dict]:
             continue
         try:
             record["date"] = _excel_date(record["date"])
+            record["video_url"] = _first_url(record.get("video_url", ""))
             for field in ("flavor", "fidelity", "ease", "score"):
                 record[field] = float(record[field])
         except (TypeError, ValueError):

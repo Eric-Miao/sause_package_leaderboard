@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="料力榜：真实测评每一款复合调味料的色香味、还原度与易用性。">
   <meta name="theme-color" content="#f0f0c0">
+  <link rel="icon" type="image/png" href="favicon.png">
   <title>料力榜｜今天，谁最有料？</title>
   <link rel="stylesheet" href="styles.css">
   <script src="data.js"></script>
@@ -46,25 +47,17 @@
           <span>搜索料包</span>
           <input id="search" type="search" placeholder="品牌、料包或评语" autocomplete="off">
         </label>
-        <label for="brand">
-          <span>品牌</span>
-          <select id="brand"><option value="">全部品牌</option></select>
-        </label>
-        <label for="sort">
-          <span>排序</span>
-          <select id="sort">
-            <option value="score">料力评分</option>
-            <option value="flavor">色香味</option>
-            <option value="fidelity">还原度</option>
-            <option value="ease">易用性</option>
-            <option value="episode">测评期数</option>
-          </select>
-        </label>
-        <button id="direction" class="direction-button" type="button" aria-pressed="false">降序</button>
+        <fieldset class="brand-filter">
+          <legend>品牌</legend>
+          <div class="brand-actions"><button id="select-all" type="button">全选</button><button id="deselect-all" type="button">全不选</button></div>
+          <div id="brand-options" class="brand-options"></div>
+        </fieldset>
       </form>
 
-      <div class="list-labels" aria-hidden="true">
-        <span>排名 / 料包</span><span>三项评分</span><span>总分</span>
+      <div class="list-labels">
+        <button type="button" data-sort="name" aria-pressed="false">排名 / 料包</button>
+        <div><button type="button" data-sort="flavor" aria-pressed="false">色香味</button><button type="button" data-sort="fidelity" aria-pressed="false">还原度</button><button type="button" data-sort="ease" aria-pressed="false">易用性</button></div>
+        <button type="button" data-sort="score" data-direction="desc" aria-pressed="true">总分</button>
       </div>
       <div id="ranking-list" class="ranking-list"></div>
       <div id="empty-state" class="empty-state" hidden>

@@ -11,12 +11,12 @@ export function escapeHtml(value) {
 
 export function queryRecords(records, options = {}) {
   const query = (options.query || "").trim().toLocaleLowerCase("zh-CN");
-  const brand = options.brand || "";
+  const brands = options.brands;
   const sortKey = options.sortKey || "score";
   const direction = options.direction || "desc";
 
   return records
-    .filter((record) => !brand || record.brand === brand)
+    .filter((record) => brands === undefined || brands.includes(record.brand))
     .filter((record) => {
       if (!query) return true;
       return [record.brand, record.name, record.comment]
@@ -25,9 +25,18 @@ export function queryRecords(records, options = {}) {
     .sort((left, right) => {
       const leftValue = sortKey === "episode" ? episodeNumber(left.episode) : left[sortKey];
       const rightValue = sortKey === "episode" ? episodeNumber(right.episode) : right[sortKey];
-      const difference = direction === "asc" ? leftValue - rightValue : rightValue - leftValue;
+      const rawDifference = typeof leftValue === "string"
+        ? leftValue.localeCompare(rightValue, "zh-CN")
+        : leftValue - rightValue;
+      const difference = direction === "asc" ? rawDifference : -rawDifference;
       return difference || episodeNumber(left.episode) - episodeNumber(right.episode);
     });
+}
+
+export function nextSort(current, key) {
+  return current.key === key
+    ? { key, direction: current.direction === "desc" ? "asc" : "desc" }
+    : { key, direction: "desc" };
 }
 
 const formatScore = (value) => Number(value).toFixed(1);
@@ -60,6 +69,9 @@ function podiumCard(record, rank) {
 }
 
 function listItem(record, rank) {
+  const videoLink = record.video_url
+    ? `<a class="video-link" href="${escapeHtml(record.video_url)}" target="_blank" rel="noopener noreferrer">观看视频</a>`
+    : "";
   return `
     <details class="rank-row">
       <summary>
@@ -77,6 +89,7 @@ function listItem(record, rank) {
           <div class="mobile-breakdown">${scoreBreakdown(record)}</div>
         </div>
         <p>${escapeHtml(record.episode)} · ${formatDate(record.date)}</p>
+        ${videoLink}
       </div>
     </details>`;
 }
@@ -88,27 +101,28 @@ function init() {
   const count = document.querySelector("#result-count");
   const empty = document.querySelector("#empty-state");
   const queryInput = document.querySelector("#search");
-  const brandSelect = document.querySelector("#brand");
-  const sortSelect = document.querySelector("#sort");
-  const directionButton = document.querySelector("#direction");
+  const brandOptions = document.querySelector("#brand-options");
   const clearButton = document.querySelector("#clear-filters");
-  let direction = "desc";
+  let sort = { key: "score", direction: "desc" };
 
   document.querySelector("#tested-count").textContent = records.length;
   podium.innerHTML = records.length
-    ? [podiumCard(records[1], 2), podiumCard(records[0], 1), podiumCard(records[2], 3)].join("")
+    ? [podiumCard(records[0], 1), podiumCard(records[1], 2), podiumCard(records[2], 3)].join("")
     : '<p class="preparing">榜单正在准备中</p>';
 
-  [...new Set(records.map((record) => record.brand))]
+  const brands = [...new Set(records.map((record) => record.brand))]
     .sort((a, b) => a.localeCompare(b, "zh-CN"))
-    .forEach((brand) => brandSelect.add(new Option(brand, brand)));
+  brandOptions.innerHTML = brands.map((brand) => `
+    <label class="brand-check"><input type="checkbox" value="${escapeHtml(brand)}" checked><span>${escapeHtml(brand)}</span></label>
+  `).join("");
 
   function render() {
+    const selectedBrands = [...brandOptions.querySelectorAll("input:checked")].map((input) => input.value);
     const result = queryRecords(records, {
       query: queryInput.value,
-      brand: brandSelect.value,
-      sortKey: sortSelect.value,
-      direction,
+      brands: selectedBrands,
+      sortKey: sort.key,
+      direction: sort.direction,
     });
     count.textContent = `找到 ${result.length} 款料包`;
     list.innerHTML = result.map((record, index) => listItem(record, index + 1)).join("");
@@ -118,19 +132,27 @@ function init() {
 
   document.querySelector("#filters").addEventListener("input", render);
   document.querySelector("#filters").addEventListener("change", render);
-  directionButton.addEventListener("click", () => {
-    direction = direction === "desc" ? "asc" : "desc";
-    directionButton.textContent = direction === "desc" ? "降序" : "升序";
-    directionButton.setAttribute("aria-pressed", String(direction === "asc"));
+  document.querySelectorAll("[data-sort]").forEach((button) => button.addEventListener("click", () => {
+    sort = nextSort(sort, button.dataset.sort);
+    document.querySelectorAll("[data-sort]").forEach((item) => {
+      const active = item.dataset.sort === sort.key;
+      item.dataset.direction = active ? sort.direction : "";
+      item.setAttribute("aria-pressed", String(active));
+    });
+    render();
+  }));
+  document.querySelector("#select-all").addEventListener("click", () => {
+    brandOptions.querySelectorAll("input").forEach((input) => { input.checked = true; });
+    render();
+  });
+  document.querySelector("#deselect-all").addEventListener("click", () => {
+    brandOptions.querySelectorAll("input").forEach((input) => { input.checked = false; });
     render();
   });
   clearButton.addEventListener("click", () => {
     queryInput.value = "";
-    brandSelect.value = "";
-    sortSelect.value = "score";
-    direction = "desc";
-    directionButton.textContent = "降序";
-    directionButton.setAttribute("aria-pressed", "false");
+    brandOptions.querySelectorAll("input").forEach((input) => { input.checked = true; });
+    sort = { key: "score", direction: "desc" };
     queryInput.focus();
     render();
   });

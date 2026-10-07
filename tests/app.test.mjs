@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { escapeHtml, queryRecords } from "../dist/app.mjs";
+import { escapeHtml, nextSort, queryRecords } from "../dist/app.mjs";
 
 const records = [
   { episode: "EP2", brand: "加点滋味", name: "肉蟹煲", comment: "鲜香微辣", score: 4.1, flavor: 4.3, fidelity: 4.2, ease: 3.8 },
@@ -15,9 +15,11 @@ test("searches brand, product name, and comment", () => {
 });
 
 test("combines brand filter with search", () => {
-  const result = queryRecords(records, { query: "肉", brand: "加点滋味" });
+  const result = queryRecords(records, { query: "肉", brands: ["加点滋味"] });
   assert.deepEqual(result.map((item) => item.episode), ["EP2"]);
-  assert.equal(queryRecords(records, { query: "肉", brand: "万字" }).length, 0);
+  assert.equal(queryRecords(records, { query: "肉", brands: ["万字"] }).length, 0);
+  assert.equal(queryRecords(records, { brands: ["万字", "盒马"] }).length, 2);
+  assert.equal(queryRecords(records, { brands: [] }).length, 0);
 });
 
 test("sorts every score key in both directions", () => {
@@ -44,4 +46,9 @@ test("breaks tied scores by episode and returns all records with empty controls"
 test("escapes workbook text before rendering HTML", () => {
   assert.equal(escapeHtml('<img src=x onerror="alert(1)">'), "&lt;img src=x onerror=&quot;alert(1)&quot;&gt;");
   assert.equal(escapeHtml("鲜香 & 温和"), "鲜香 &amp; 温和");
+});
+
+test("clicking the same column toggles direction and a new column starts descending", () => {
+  assert.deepEqual(nextSort({ key: "score", direction: "desc" }, "score"), { key: "score", direction: "asc" });
+  assert.deepEqual(nextSort({ key: "score", direction: "asc" }, "flavor"), { key: "flavor", direction: "desc" });
 });
