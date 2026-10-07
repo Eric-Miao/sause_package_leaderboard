@@ -147,11 +147,14 @@ footer a { color: var(--ink); text-underline-offset: 5px; }
 @media (max-width: 560px) {
   .site-header, .hero, .ranking-section, footer { width: min(100% - 24px, 1180px); }
   .site-header p { display: none; }
-  .hero { padding-top: 42px; }
-  .hero-intro { margin-bottom: 42px; }
-  h1 { font-size: clamp(3.4rem, 18vw, 5rem); }
-  .podium-card { min-height: 210px; padding-inline: 8px; }
-  .ranking-heading { display: block; }
+  .hero { padding-top: 18px; }
+  .hero-intro { position: relative; margin-bottom: 18px; }
+  .hero-intro h1 { position: absolute; top: -64px; left: 50%; transform: translateX(-50%); width: max-content; font-size: 1.05rem; line-height: 1; white-space: nowrap; }
+  .hero-intro h1 br { display: none; }
+  .hero-note { display: none; }
+  .podium-card { min-height: 170px; padding: 42px 8px 12px; }
+  .podium-card--1::before { content: "👑"; position: absolute; top: 4px; left: 50%; transform: translateX(-50%); font-size: 1.45rem; line-height: 1; }
+  .ranking-heading { display: none; }
   .ranking-heading > p { margin-top: 14px; text-align: left; }
   .filters { padding: 14px; }
   .ranking-list { margin-top: 20px; }
