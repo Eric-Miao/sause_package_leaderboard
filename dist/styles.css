@@ -147,14 +147,19 @@ footer a { color: var(--ink); text-underline-offset: 5px; }
 @media (max-width: 560px) {
   .site-header, .hero, .ranking-section, footer { width: min(100% - 24px, 1180px); }
   .site-header p { display: none; }
-  .hero { padding-top: 18px; }
+  .hero { padding: 18px 0 0; }
   .hero-intro { position: relative; margin-bottom: 18px; }
   .hero-intro h1 { position: absolute; top: -64px; left: 50%; transform: translateX(-50%); width: max-content; font-size: 1.05rem; line-height: 1; white-space: nowrap; }
   .hero-intro h1 br { display: none; }
-  .hero-note { display: none; }
-  .podium-card { min-height: 170px; padding: 42px 8px 12px; }
-  .podium-card--1::before { content: "👑"; position: absolute; top: 4px; left: 50%; transform: translateX(-50%); font-size: 1.45rem; line-height: 1; }
+  .hero-note { max-width: 32ch; }
+  .hero-note > p:first-child { margin-top: 0; }
+  .tested { margin-top: 12px; }
+  .tested strong { font-size: 2.6rem; }
+  .podium { padding-top: 24px; }
+  .podium-card { min-height: 164px; padding: 42px 8px 12px; overflow: visible; }
+  .podium-card--1::before { content: ""; position: absolute; top: -28px; left: 50%; width: 42px; height: 42px; transform: translateX(-50%); background: url("crown.png") center / contain no-repeat; }
   .ranking-heading { display: none; }
+  .ranking-section { padding: 24px 0 80px; }
   .ranking-heading > p { margin-top: 14px; text-align: left; }
   .filters { padding: 14px; }
   .rank-row summary { min-height: 86px; padding-inline: 16px; gap: 12px; }
