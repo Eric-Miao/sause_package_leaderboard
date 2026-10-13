@@ -1,4 +1,5 @@
 const episodeNumber = (value = "") => Number.parseInt(String(value).replace(/\D/g, ""), 10) || Number.MAX_SAFE_INTEGER;
+const isMissing = (value) => value === null || value === undefined || value === "" || value === "-" || Number.isNaN(value);
 
 export function escapeHtml(value) {
   return String(value ?? "")
@@ -26,6 +27,10 @@ export function queryRecords(records, options = {}) {
     .sort((left, right) => {
       const leftValue = sortKey === "episode" ? episodeNumber(left.episode) : left[sortKey];
       const rightValue = sortKey === "episode" ? episodeNumber(right.episode) : right[sortKey];
+      const leftMissing = isMissing(leftValue);
+      const rightMissing = isMissing(rightValue);
+      if (leftMissing !== rightMissing) return leftMissing ? 1 : -1;
+      if (leftMissing && rightMissing) return episodeNumber(left.episode) - episodeNumber(right.episode);
       const rawDifference = typeof leftValue === "string"
         ? leftValue.localeCompare(rightValue, "zh-CN")
         : leftValue - rightValue;
@@ -40,8 +45,8 @@ export function nextSort(current, key) {
     : { key, direction: "desc" };
 }
 
-const formatScore = (value) => Number(value).toFixed(1);
-const formatDate = (value) => new Intl.DateTimeFormat("zh-CN", {
+const formatScore = (value) => isMissing(value) ? "-" : Number(value).toFixed(1);
+const formatDate = (value) => isMissing(value) ? "-" : new Intl.DateTimeFormat("zh-CN", {
   year: "numeric", month: "long", day: "numeric",
 }).format(new Date(`${value}T00:00:00`));
 
@@ -86,10 +91,10 @@ function listItem(record, rank) {
       </summary>
       <div class="rank-detail">
         <div>
-          <blockquote>${escapeHtml(record.comment)}</blockquote>
+          <blockquote>${escapeHtml(record.comment || "-")}</blockquote>
           <div class="mobile-breakdown">${scoreBreakdown(record)}</div>
         </div>
-        <p>${escapeHtml(record.episode)} · ${formatDate(record.date)}</p>
+        <p>${escapeHtml(record.episode || "-")} · ${formatDate(record.date)}</p>
         ${videoLink}
       </div>
     </details>`;

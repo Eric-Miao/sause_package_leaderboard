@@ -19,7 +19,8 @@ def make_workbook(path: Path) -> None:
         ["日期", "期数", "品牌", "料包", "色香味", "还原度", "易用性", "料力评分", "评语", "视频链接"],
         [46274, "EP2", "甲牌", "好味汁", 4.2, 4.1, 4.0, 4.1, "鲜香", "分享 https://example.com/video/2 更多文字"],
         [46275, "EP1", "乙牌", "暖汤底", 4.0, 4.2, 4.1, 4.1, "温和", "https://example.com/video/1"],
-        [46276, "EP3", "", "", "", "", "", "#DIV/0!", "", ""],
+        [46276, "EP10", "沃集鲜", "党参黄芪骨汤米线", 3.9, "-", 4.3, 4.1, "药香突出，鸡肉提鲜", ""],
+        [46277, "EP3", "", "", "", "", "", "#DIV/0!", "", ""],
     ]
 
     def cell(ref: str, value: object) -> str:
@@ -53,12 +54,14 @@ class BuildDataTests(unittest.TestCase):
             make_workbook(workbook)
             records = extract_records(workbook)
 
-        self.assertEqual([record["episode"] for record in records], ["EP1", "EP2"])
+        self.assertEqual([record["episode"] for record in records], ["EP1", "EP2", "EP10"])
         self.assertEqual(records[0]["date"], "2026-09-10")
         self.assertEqual(records[0]["brand"], "乙牌")
         self.assertEqual(records[0]["score"], 4.1)
         self.assertEqual(records[0]["video_url"], "https://example.com/video/1")
         self.assertEqual(records[1]["video_url"], "https://example.com/video/2")
+        self.assertIsNone(records[2]["fidelity"])
+        self.assertEqual(records[2]["score"], 4.1)
         self.assertNotIn("#DIV/0!", repr(records))
 
     def test_writes_browser_global(self):
@@ -82,13 +85,17 @@ class BuildDataTests(unittest.TestCase):
             index = Path(directory) / "index.html"
             index.write_text(source, encoding="utf-8")
             write_fallback(
-                [{"brand": "甲<script>", "name": "好味汁", "score": 4.1, "comment": "鲜香"}],
+                [
+                    {"brand": "甲<script>", "name": "好味汁", "score": 4.1, "comment": "鲜香"},
+                    {"brand": "乙牌", "name": "待评分", "score": None, "comment": ""},
+                ],
                 index,
             )
             text = index.read_text(encoding="utf-8")
 
         self.assertIn("甲&lt;script&gt;", text)
         self.assertIn("好味汁", text)
+        self.assertIn("<strong>2. 乙牌 · 待评分</strong><span>-</span><p>-</p>", text)
         self.assertNotIn("甲<script>", text)
 
 

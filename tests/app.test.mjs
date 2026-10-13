@@ -6,6 +6,7 @@ const records = [
   { episode: "EP2", brand: "加点滋味", name: "肉蟹煲", comment: "鲜香微辣", score: 4.1, flavor: 4.3, fidelity: 4.2, ease: 3.8 },
   { episode: "EP1", brand: "万字", name: "寿喜烧料汁", comment: "汤浓味醇", score: 4.1, flavor: 4.0, fidelity: 4.3, ease: 4.1 },
   { episode: "EP3", brand: "盒马", name: "金汤肥牛", comment: "酸辣突出", score: 3.9, flavor: 3.8, fidelity: 3.8, ease: 4.1 },
+  { episode: "EP10", brand: "沃集鲜", name: "党参黄芪骨汤米线", comment: "药香突出", score: 4.1, flavor: 3.9, fidelity: null, ease: 4.3 },
 ];
 
 test("searches brand, product name, and comment", () => {
@@ -26,21 +27,30 @@ test("sorts every score key in both directions", () => {
   for (const key of ["score", "flavor", "fidelity", "ease"]) {
     const descending = queryRecords(records, { sortKey: key, direction: "desc" });
     const ascending = queryRecords(records, { sortKey: key, direction: "asc" });
-    assert.ok(descending[0][key] >= descending.at(-1)[key]);
-    assert.ok(ascending[0][key] <= ascending.at(-1)[key]);
+    const descendingValues = descending.map((item) => item[key]).filter((value) => value !== null);
+    const ascendingValues = ascending.map((item) => item[key]).filter((value) => value !== null);
+    assert.ok(descendingValues[0] >= descendingValues.at(-1));
+    assert.ok(ascendingValues[0] <= ascendingValues.at(-1));
   }
   assert.deepEqual(
     queryRecords(records, { sortKey: "episode", direction: "asc" }).map((item) => item.episode),
-    ["EP1", "EP2", "EP3"],
+    ["EP1", "EP2", "EP3", "EP10"],
   );
+});
+
+test("always sorts missing field values last", () => {
+  for (const direction of ["asc", "desc"]) {
+    const result = queryRecords(records, { sortKey: "fidelity", direction });
+    assert.equal(result.at(-1).episode, "EP10");
+  }
 });
 
 test("breaks tied scores by episode and returns all records with empty controls", () => {
   assert.deepEqual(
     queryRecords(records, { sortKey: "score", direction: "desc" }).map((item) => item.episode),
-    ["EP1", "EP2", "EP3"],
+    ["EP1", "EP2", "EP10", "EP3"],
   );
-  assert.equal(queryRecords(records, {}).length, 3);
+  assert.equal(queryRecords(records, {}).length, 4);
 });
 
 test("escapes workbook text before rendering HTML", () => {

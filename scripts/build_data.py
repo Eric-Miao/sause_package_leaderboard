@@ -52,6 +52,13 @@ def _first_url(value: str) -> str:
     return match.group(0).rstrip("，。；;）)") if match else ""
 
 
+def _optional_number(value: str) -> float | None:
+    value = (value or "").strip()
+    if not value or value == "-" or value.startswith("#"):
+        return None
+    return float(value)
+
+
 def extract_records(path: Path) -> list[dict]:
     with zipfile.ZipFile(path) as archive:
         names = set(archive.namelist())
@@ -101,19 +108,25 @@ def extract_records(path: Path) -> list[dict]:
     records = []
     for row in rows[header_index + 1 :]:
         record = {field: row.get(column, "").strip() for column, field in columns.items()}
-        required = ("brand", "name", "flavor", "fidelity", "ease", "score")
-        if not all(record.get(field) and not record[field].startswith("#") for field in required):
+        if not record.get("brand") or not record.get("name"):
             continue
         try:
-            record["date"] = _excel_date(record["date"])
+            record["date"] = _excel_date(record["date"]) if record.get("date") else ""
             record["video_url"] = _first_url(record.get("video_url", ""))
             for field in ("flavor", "fidelity", "ease", "score"):
-                record[field] = float(record[field])
+                record[field] = _optional_number(record.get(field, ""))
         except (TypeError, ValueError):
             continue
         records.append(record)
 
-    return sorted(records, key=lambda item: (-item["score"], _episode_number(item["episode"])))
+    return sorted(
+        records,
+        key=lambda item: (
+            item["score"] is None,
+            -(item["score"] or 0),
+            _episode_number(item.get("episode", "")),
+        ),
+    )
 
 
 def write_data(records: list[dict], output: Path) -> None:
@@ -132,7 +145,13 @@ def write_fallback(records: list[dict], index_path: Path) -> None:
         "<li>"
         f"<strong>{rank}. {html.escape(record['brand'])} · {html.escape(record['name'])}</strong>"
         f"<span>{record['score']:.1f} 分</span>"
-        f"<p>{html.escape(record.get('comment', ''))}</p>"
+        f"<p>{html.escape(record.get('comment') or '-')}</p>"
+        "</li>"
+        if record.get("score") is not None
+        else "<li>"
+        f"<strong>{rank}. {html.escape(record['brand'])} · {html.escape(record['name'])}</strong>"
+        "<span>-</span>"
+        f"<p>{html.escape(record.get('comment') or '-')}</p>"
         "</li>"
         for rank, record in enumerate(records, start=1)
     )
