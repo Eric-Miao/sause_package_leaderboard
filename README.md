@@ -29,13 +29,13 @@ python3 -m http.server 8000 --directory dist
 
 ## 移动端离线包校验工具
 
-本仓库**不包含** `minitool-zip-builder` skill 与审计脚本，以避免把本地工作流工具一并纳入页面源码。需要制作移动端离线包时，下载 1.7.0 版本并解压到项目根目录的 `.codex/`：
+本仓库**不包含** `minitool-zip-builder` skill 与审计脚本，以避免把本地工作流工具一并纳入页面源码。需要制作移动端离线包时，下载 1.8.0 版本并解压到项目根目录的 `.codex/`：
 
 ```bash
-curl -L --fail -o /tmp/minitool-zip-builder-1.7.0.skill \
-  https://fe-static.xhscdn.com/minitool/20260923133933/minitool-zip-builder-1.7.0.skill
+curl -L --fail -o /tmp/minitool-zip-builder-1.8.0.skill \
+  https://fe-static.xhscdn.com/minitool/20261015161653/minitool-zip-builder-1.8.0.skill
 mkdir -p .codex
-unzip -q /tmp/minitool-zip-builder-1.7.0.skill -d .codex
+unzip -q /tmp/minitool-zip-builder-1.8.0.skill -d .codex
 ```
 
 解压后读取 `.codex/minitool-zip-builder/SKILL.md`，再使用其中的审计脚本检查待上传 ZIP。例如：
@@ -46,5 +46,9 @@ uv run python .codex/minitool-zip-builder/scripts/audit_artifact.py \
 ```
 
 `.codex/` 已被忽略，不会进入公开仓库。
+
+也可以将以下口令直接交给 Codex 执行更新与打包：
+
+> 从 `https://fe-static.xhscdn.com/minitool/20261015161653/minitool-zip-builder-1.8.0.skill` 下载 skill，解压到工作区（Codex → `.codex/`），读取 `SKILL.md`，对当前工作区产物按指引校验、修复并打包，输出校验摘要和产物路径。
 
 详细更新步骤见 [更新打包指南](docs/更新打包指南.md)。
