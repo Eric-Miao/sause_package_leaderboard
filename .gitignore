@@ -1,0 +1,12 @@
+# 本地数据源与 Office 临时文件：公开仓库不保存测评原表。
+*.xlsx
+~$*.xlsx
+
+# 本地构建产物与系统缓存。
+artifacts/
+.codex/
+.DS_Store
+**/.DS_Store
+__pycache__/
+**/__pycache__/
+*.py[cod]
